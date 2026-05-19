@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rock · Paper · Scissors ⚡</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style-rock.css" />
+  </head>
+  <body>
+
+    <!-- Floating particle background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Settings (gear) button -->
+    <button
+      class="settings-toggle"
+      onclick="toggleSettings()"
+      aria-label="Open settings"
+      title="Settings"
+    >&#9881;</button>
+
+    <!-- Theme toggle -->
+    <button
+      class="theme-toggle"
+      onclick="toggleTheme()"
+      aria-label="Toggle theme"
+      title="Toggle theme"
+    ><span id="theme-icon">&#9789;</span></button>
+
+    <main class="game">
+
+      <img
+        class="icon-game"
+        src="./icon-rock-paper-Scissor.png"
+        alt="Rock Paper Scissors logo"
+      />
+
+      <h1 class="title">
+        <span id="player-name-title">Player</span>
+        <span class="vs">vs</span>
+        Computer
+      </h1>
+
+      <!-- Win / loss streak -->
+      <div class="streak-display" id="streak-display">&nbsp;</div>
+
+      <!-- Choice buttons -->
+      <section class="player-choice-section">
+        <p class="section-label">Select your weapon</p>
+        <div class="choice-container">
+          <button
+            class="choice"
+            onclick="handleClick(this)"
+            value="paper-emoji"
+            aria-label="Paper"
+            title="Paper (P)"
+          >
+            <img class="image-choice" src="./paper-emoji.png" alt="Paper" />
+            <span class="choice-label">Paper</span>
+          </button>
+          <button
+            class="choice"
+            onclick="handleClick(this)"
+            value="rock-emoji"
+            aria-label="Rock"
+            title="Rock (R)"
+          >
+            <img class="image-choice" src="./rock-emoji.png" alt="Rock" />
+            <span class="choice-label">Rock</span>
+          </button>
+          <button
+            class="choice"
+            onclick="handleClick(this)"
+            value="scissors-emoji"
+            aria-label="Scissors"
+            title="Scissors (S)"
+          >
+            <img class="image-choice" src="./scissors-emoji.png" alt="Scissors" />
+            <span class="choice-label">Scissors</span>
+          </button>
+        </div>
+        <p class="hint">Press <kbd>R</kbd> <kbd>P</kbd> <kbd>S</kbd> &nbsp;·&nbsp; <kbd>A</kbd> auto-play</p>
+      </section>
+
+      <!-- Battle arena -->
+      <section class="result-block">
+        <p class="section-label">Battle Arena</p>
+
+        <div class="result-container">
+          <div class="result-card">
+            <p class="player-name-display" id="player-name-display">You</p>
+            <img
+              class="image-choice"
+              id="player-img"
+              src="./aesthetic-moving.gif"
+              alt="Your choice"
+            />
+          </div>
+
+          <div class="vs-divider">
+            <span class="vs-text">VS</span>
+          </div>
+
+          <div class="result-card">
+            <p class="player-name-display">Computer</p>
+            <img
+              class="image-choice"
+              id="computer-img"
+              src="./aesthetic-moving.gif"
+              alt="Computer choice"
+            />
+          </div>
+        </div>
+
+        <p class="round-message" id="round-message">Make your move!</p>
+
+        <!-- Last 8 rounds history dots -->
+        <div class="round-history" id="round-history"></div>
+
+        <!-- Score chips -->
+        <div class="results-container" id="result-update">
+          <div class="score-chip wins"   id="w" data-val="0">W &nbsp;0</div>
+          <div class="score-chip losses" id="l" data-val="0">L &nbsp;0</div>
+          <div class="score-chip ties"   id="t" data-val="0">T &nbsp;0</div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="action-btns">
+          <button onclick="resetBtn()" class="btn-ghost">Reset</button>
+          <button onclick="autoPlay()" class="btn-accent" id="auto-btn">Auto Play</button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Game Over overlay -->
+    <div class="game-over-overlay" id="game-over" style="display:none">
+      <div class="game-over-card">
+        <span class="game-over-icon" id="go-icon">🏆</span>
+        <h2 class="game-over-title" id="go-title">Game Over!</h2>
+        <p class="game-over-msg" id="go-msg"></p>
+        <div class="go-stats" id="go-stats"></div>
+        <button class="btn-accent" onclick="resetBtn()" style="margin-top:24px">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Settings drawer -->
+    <aside class="settings-panel" id="settings-panel" aria-hidden="true">
+      <div class="settings-header">
+        <h2>&#9881; Customize</h2>
+        <button
+          class="close-btn"
+          onclick="toggleSettings()"
+          aria-label="Close settings"
+        >&times;</button>
+      </div>
+
+      <label class="setting">
+        <span>Player Name</span>
+        <input type="text" id="setting-name" maxlength="20" placeholder="You" />
+      </label>
+
+      <label class="setting">
+        <span>Difficulty</span>
+        <select id="setting-difficulty">
+          <option value="easy">Easy (computer favors losing)</option>
+          <option value="normal" selected>Normal (random)</option>
+          <option value="hard">Hard (reads your patterns)</option>
+        </select>
+      </label>
+
+      <label class="setting">
+        <span>Win goal: <strong id="max-score-value">20</strong></span>
+        <input type="range" id="setting-maxscore" min="3" max="50" value="20" />
+      </label>
+
+      <label class="setting">
+        <span>Autoplay speed: <strong id="speed-value">1.0</strong>s</span>
+        <input type="range" id="setting-speed" min="0.2" max="2" step="0.1" value="1" />
+      </label>
+
+      <label class="setting">
+        <span>Accent color</span>
+        <input type="color" id="setting-accent" value="#22d3ee" />
+      </label>
+
+      <label class="setting toggle">
+        <span>Sound effects</span>
+        <input type="checkbox" id="setting-sound" checked />
+      </label>
+
+      <label class="setting toggle">
+        <span>Confetti on win</span>
+        <input type="checkbox" id="setting-confetti" checked />
+      </label>
+
+      <label class="setting toggle">
+        <span>Particles</span>
+        <input type="checkbox" id="setting-particles" checked />
+      </label>
+
+      <button class="save-btn btn-accent" onclick="saveSettings()">Save Changes</button>
+    </aside>
+
+    <!-- Confetti canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <script src="rock-paper-scissor.js"></script>
+  </body>
+</html>
